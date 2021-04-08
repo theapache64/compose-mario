@@ -1,5 +1,3 @@
 package com.theapache64.composemario.models
 
-class Board {
-
-}
+class Mario(x: Int, y: Int) : Point(x, y)
