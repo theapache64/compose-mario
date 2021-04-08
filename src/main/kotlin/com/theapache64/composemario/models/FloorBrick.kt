@@ -1,6 +1,6 @@
 package com.theapache64.composemario.models
 
-class FloorBrick(
-    val x: Int,
-    val y: Int,
+data class FloorBrick(
+    var x: Int,
+    var y: Int,
 )
