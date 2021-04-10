@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -20,6 +22,7 @@ import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
 import com.theapache64.composemario.core.R
 import com.theapache64.composemario.core.base.Game
+import com.theapache64.composemario.models.FloorBrick
 import com.theapache64.composemario.theme.CornflowerBlue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -113,22 +116,16 @@ fun main() {
                 color = CornflowerBlue
             )
 
-            // Floor
-            val floorBricks = gameFrame.floorBricks
-
-            val visibleBricks = floorBricks.filter {
-                it.x in -MarioGame.BRICK_WIDTH..WINDOW_WIDTH && it.y in 0..WINDOW_HEIGHT
-            } // optimising
-
-            for (floorBrick in visibleBricks) {
-
-                // Floor
+            // Rendering floor bricks
+            for (floorBrick in gameFrame.floorBricks.filterVisibleBricks()) {
+                // FloorBrick
                 drawImage(
                     image = R.graphics.brickPng,
                     dstOffset = IntOffset(floorBrick.x, floorBrick.y),
-                    dstSize = IntSize(MarioGame.BRICK_WIDTH, MarioGame.BRICK_HEIGHT)
+                    dstSize = IntSize(FloorBrick.BRICK_WIDTH, FloorBrick.BRICK_HEIGHT),
                 )
             }
+
 
             // Mario
             val mario = gameFrame.mario
@@ -142,7 +139,21 @@ fun main() {
                     dstSize = mario.action.dstSize,
                 )
             }
+
+            val marioFootX = mario.dstOffset.x
+            val marioFootY = mario.dstOffset.y + mario.action.dstSize.height
+            drawCircle(
+                Color.Red,
+                3f,
+                center = Offset(marioFootX.toFloat(), marioFootY.toFloat())
+            )
         }
     }
 
+}
+
+private fun List<FloorBrick>.filterVisibleBricks(): List<FloorBrick> {
+    return this.filter { brick ->
+        brick.x in -FloorBrick.BRICK_WIDTH..WINDOW_WIDTH && brick.y in 0..WINDOW_HEIGHT
+    }
 }
