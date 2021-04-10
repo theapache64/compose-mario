@@ -36,11 +36,67 @@ data class Mario(
             srcSize = IntSize(16, 32),
         ),
 
+        // SMALL - RIGHT
         SMALL_LOOK_RIGHT(
             srcOffset = IntOffset(211, 0),
             srcSize = IntSize(13, 16)
-        )
+        ),
 
+        SMALL_WALK_RIGHT_1(
+            srcOffset = IntOffset(241, 0),
+            srcSize = IntSize(14, 15)
+        ),
+
+        SMALL_WALK_RIGHT_2(
+            srcOffset = IntOffset(272, 0),
+            srcSize = IntSize(12, 16)
+        ),
+
+        SMALL_WALK_RIGHT_3(
+            srcOffset = IntOffset(300, 0),
+            srcSize = IntSize(16, 16)
+        ),
+
+        SMALL_WALK_RIGHT_BRAKE(
+            srcOffset = IntOffset(331, 0),
+            srcSize = IntSize(14, 16)
+        ),
+
+        SMALL_RUN_RIGHT(
+            srcOffset = IntOffset(331, 0),
+            srcSize = IntSize(14, 16)
+        ),
+
+        // SMALL - LEFT
+        SMALL_LOOK_LEFT(
+            srcOffset = IntOffset(181, 0),
+            srcSize = IntSize(13, 16)
+        ),
+
+        SMALL_WALK_LEFT_1(
+            srcOffset = IntOffset(150, 0),
+            srcSize = IntSize(14, 15)
+        ),
+
+        SMALL_WALK_LEFT_2(
+            srcOffset = IntOffset(121, 0),
+            srcSize = IntSize(12, 16)
+        ),
+
+        SMALL_WALK_LEFT_3(
+            srcOffset = IntOffset(89, 0),
+            srcSize = IntSize(16, 16)
+        ),
+
+        SMALL_WALK_LEFT_BRAKE(
+            srcOffset = IntOffset(89, 0),
+            srcSize = IntSize(16, 16)
+        ),
+
+        SMALL_RUN_LEFT(
+            srcOffset = IntOffset(331, 0),
+            srcSize = IntSize(17, 16)
+        ),
 
     }
 }

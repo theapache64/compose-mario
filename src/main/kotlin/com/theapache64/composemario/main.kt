@@ -149,13 +149,13 @@ fun main() {
                     }
 
                     // TODO: To remove : only for debug
-                    val marioFootX = mario.dstOffset.x
+                    /*val marioFootX = mario.dstOffset.x
                     val marioFootY = mario.dstOffset.y + mario.action.dstSize.height
                     drawCircle(
                         Color.Red,
                         3f,
                         center = Offset(marioFootX.toFloat(), marioFootY.toFloat())
-                    )
+                    )*/
                 }
 
                 if (gameFrame.isGameOver) {

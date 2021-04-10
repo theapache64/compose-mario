@@ -114,9 +114,54 @@ private fun Mario.step(
     }
 
 
+    val newAction = when (direction) {
+        Direction.MOVE_RIGHT -> {
+            when (action) {
+                Mario.Action.SMALL_WALK_LEFT_BRAKE -> Mario.Action.SMALL_WALK_RIGHT_1
+                Mario.Action.SMALL_LOOK_RIGHT -> Mario.Action.SMALL_WALK_RIGHT_1
+                Mario.Action.SMALL_WALK_RIGHT_1 -> Mario.Action.SMALL_WALK_RIGHT_2
+                Mario.Action.SMALL_WALK_RIGHT_2 -> Mario.Action.SMALL_WALK_RIGHT_3
+                Mario.Action.SMALL_WALK_RIGHT_3 -> Mario.Action.SMALL_WALK_RIGHT_1
+
+                // If he was running left, then brake
+                Mario.Action.SMALL_WALK_LEFT_1,
+                Mario.Action.SMALL_WALK_LEFT_2,
+                Mario.Action.SMALL_WALK_LEFT_3,
+                // -> Mario.Action.SMALL_WALK_LEFT_BRAKE
+                -> TODO("Brake left")
+
+
+                else -> Mario.Action.SMALL_LOOK_RIGHT // TODO
+            }
+        }
+        Direction.MOVE_LEFT -> {
+            when (action) {
+                Mario.Action.SMALL_WALK_RIGHT_BRAKE -> Mario.Action.SMALL_WALK_LEFT_1
+                Mario.Action.SMALL_LOOK_LEFT -> Mario.Action.SMALL_WALK_LEFT_1
+                Mario.Action.SMALL_WALK_LEFT_1 -> Mario.Action.SMALL_WALK_LEFT_2
+                Mario.Action.SMALL_WALK_LEFT_2 -> Mario.Action.SMALL_WALK_LEFT_3
+                Mario.Action.SMALL_WALK_LEFT_3 -> Mario.Action.SMALL_WALK_LEFT_1
+
+                // If he was running right, then brake
+                Mario.Action.SMALL_WALK_RIGHT_1,
+                Mario.Action.SMALL_WALK_RIGHT_2,
+                Mario.Action.SMALL_WALK_RIGHT_3,
+                -> Mario.Action.SMALL_WALK_RIGHT_BRAKE
+
+                else -> Mario.Action.SMALL_LOOK_LEFT // TODO
+            }
+        }
+        Direction.IDLE_RIGHT -> Mario.Action.SMALL_LOOK_RIGHT
+        Direction.IDLE_LEFT -> Mario.Action.SMALL_LOOK_LEFT
+        else -> {
+            // TODO : Handle more directions
+            action
+        }
+    }
 
     return copy(
-        dstOffset = IntOffset(newX, newY)
+        dstOffset = IntOffset(newX, newY),
+        action = newAction
     )
 }
 
