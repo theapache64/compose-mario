@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 import com.theapache64.composemario.WINDOW_HEIGHT
 import com.theapache64.composemario.WINDOW_WIDTH
+import com.theapache64.composemario.core.MarioGame.Companion.MARIO_SPEED
 import com.theapache64.composemario.core.base.Game
 import com.theapache64.composemario.models.FloorBrick
 import com.theapache64.composemario.models.GameFrame
@@ -15,6 +16,7 @@ class MarioGame : Game {
 
     companion object {
 
+        const val MARIO_SPEED = 15
         const val LEVEL_LENGTH = WINDOW_WIDTH * 0.5 // 10 times the screen
 
         /**
@@ -97,12 +99,12 @@ private fun Mario.step(
 
     val newX = if (marioXPercentage <= Mario.PUSH_PERCENTAGE && direction == Direction.MOVE_RIGHT) {
         println("Mario moves")
-        dstOffset.x + 10
+        dstOffset.x + MARIO_SPEED
     } else {
         when (direction) {
             Direction.MOVE_LEFT -> {
                 println("Mario moving left")
-                val nx = dstOffset.x - 10
+                val nx = dstOffset.x - MARIO_SPEED
                 if (nx >= 0) {
                     nx
                 } else {
@@ -127,7 +129,7 @@ private fun Mario.step(
                 Mario.Action.SMALL_WALK_LEFT_1,
                 Mario.Action.SMALL_WALK_LEFT_2,
                 Mario.Action.SMALL_WALK_LEFT_3,
-                // -> Mario.Action.SMALL_WALK_LEFT_BRAKE
+                    // -> Mario.Action.SMALL_WALK_LEFT_BRAKE
                 -> TODO("Brake left")
 
 
@@ -185,7 +187,7 @@ private fun List<FloorBrick>.step(
             if (marioYPercentage >= Mario.PUSH_PERCENTAGE) {
                 // Mario moved more than push percentage, now let's move the bricks
                 map { brick ->
-                    brick.copy(x = brick.x - 10)
+                    brick.copy(x = brick.x - MARIO_SPEED)
                 }
             } else {
                 this
