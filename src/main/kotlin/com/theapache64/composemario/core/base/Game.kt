@@ -7,5 +7,5 @@ import com.theapache64.composemario.models.GameFrame
 interface Game {
     val gameFrame: State<GameFrame>
     fun step()
-    fun move(direction: Direction)
+    fun setDirection(direction: Direction)
 }

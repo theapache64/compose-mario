@@ -9,19 +9,17 @@ import com.theapache64.composemario.core.base.Game
 import com.theapache64.composemario.models.FloorBrick
 import com.theapache64.composemario.models.GameFrame
 import com.theapache64.composemario.models.Mario
-import com.theapache64.composemario.theme.OrangeRoughy
 import kotlin.math.ceil
 
 class MarioGame : Game {
 
     companion object {
 
-        private const val LEVEL_LENGTH = WINDOW_WIDTH * 2 // 10 times the screen
+        private const val LEVEL_LENGTH = WINDOW_WIDTH * 10 // 10 times the screen
 
         // Brick
         const val BRICK_WIDTH = 30
         const val BRICK_HEIGHT = 30
-        private val FLOOR_BRICK_COLOR = OrangeRoughy
 
         const val MIN_Y = (WINDOW_HEIGHT * 0.70).toInt()
     }
@@ -33,7 +31,7 @@ class MarioGame : Game {
         // First frame
         _gameFrame = mutableStateOf(
             GameFrame(
-                mario = Mario(20, MIN_Y - 60),
+                mario = Mario(action = Mario.START_ACTION, dstOffset = Mario.START_OFFSET),
                 floorBricks = createFloorBricks(),
                 goombas = listOf(),
                 direction = Direction.IDLE_RIGHT // Face right
@@ -46,47 +44,18 @@ class MarioGame : Game {
 
     override fun step() {
         update {
-            copy()
+            copy(
+                mario = mario.step(direction),
+                floorBricks = floorBricks.step(mario, direction)
+            )
         }
     }
 
-    override fun move(direction: Direction) {
+    override fun setDirection(direction: Direction) {
         update {
-            when (direction) {
-                Direction.IDLE_LEFT -> {
-                    copy()
-                }
-                Direction.IDLE_RIGHT -> {
-                    copy()
-                }
-                Direction.MOVE_LEFT -> {
-                    val newBrickList = floorBricks.map { brick ->
-                        brick.x = brick.x + 10
-                        brick
-                    }
-
-                    println(newBrickList)
-
-                    copy(
-                        floorBricks = newBrickList
-                    )
-                }
-                Direction.MOVE_RIGHT -> {
-                    println("Moving right two")
-                    val newBrickList = floorBricks.map { brick ->
-                        brick.x = brick.x - 10
-                        brick.copy()
-                    }
-
-                    println(newBrickList)
-
-                    copy(
-                        floorBricks = newBrickList
-                    )
-                }
-                Direction.UP -> TODO()
-                Direction.DOWN -> TODO()
-            }
+            copy(
+                direction = direction
+            )
         }
     }
 
@@ -116,7 +85,61 @@ class MarioGame : Game {
     }
 
     private inline fun update(func: GameFrame.() -> GameFrame) {
-        println("Updated")
         _gameFrame.value = _gameFrame.value.func()
+    }
+}
+
+private fun Mario.step(
+    direction: Direction,
+): Mario {
+    val marioAt = (dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
+    return if (marioAt <= Mario.PUSH_PERCENTAGE) {
+        copy(
+            dstOffset = when (direction) {
+                Direction.MOVE_RIGHT -> {
+                    dstOffset.copy(x = dstOffset.x + 10)
+                }
+                else -> dstOffset
+            }
+        )
+    } else {
+        copy()
+    }
+}
+
+private fun List<FloorBrick>.step(
+    mario: Mario,
+    direction: Direction,
+): List<FloorBrick> {
+    return when (direction) {
+        Direction.IDLE_LEFT -> {
+            this
+        }
+        Direction.IDLE_RIGHT -> {
+            this
+        }
+        Direction.MOVE_LEFT -> {
+            map { brick ->
+                brick.copy(x = brick.x + 10)
+            }
+        }
+        Direction.MOVE_RIGHT -> {
+            val marioAt = (mario.dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
+            println("MarioAt : $marioAt")
+            if (marioAt >= Mario.PUSH_PERCENTAGE) {
+                println("Mario at max")
+                map { brick ->
+                    brick.copy(x = brick.x - 10)
+                }
+            } else {
+                this
+            }
+        }
+        Direction.UP -> {
+            this
+        }
+        Direction.DOWN -> {
+            this
+        }
     }
 }

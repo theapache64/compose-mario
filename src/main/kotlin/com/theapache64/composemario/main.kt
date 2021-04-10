@@ -8,7 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
@@ -16,10 +18,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
-import com.theapache64.composemario.core.MarioGame.Companion.MIN_Y
+import com.theapache64.composemario.core.R
 import com.theapache64.composemario.core.base.Game
 import com.theapache64.composemario.theme.CornflowerBlue
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.awt.event.KeyEvent
 
 const val WINDOW_WIDTH = 1020
@@ -28,10 +31,14 @@ const val WINDOW_HEIGHT = 600
 
 val focusRequester = FocusRequester()
 
-val brickPng = imageFromResource("floor.png")
-val marioSprite = imageFromResource("mario_sprite.png")
+val marioPaint by lazy {
+    Paint().apply { filterQuality = FilterQuality.None }
+}
+
 
 fun main() {
+
+    val game: Game = MarioGame()
 
     Window(
         title = "Compose Mario",
@@ -39,20 +46,20 @@ fun main() {
         resizable = false
     ) {
 
-        val game: Game = MarioGame()
-
 
         LaunchedEffect(Unit) {
             delay(1000)
             focusRequester.requestFocus()
 
-            /*while (isActive) {
+            while (isActive) {
                 delay(60)
                 game.step()
-            }*/
+            }
 
         }
 
+
+        val gameFrame = game.gameFrame.value
 
         Canvas(
             modifier = Modifier
@@ -66,11 +73,11 @@ fun main() {
                             when (it.key) {
                                 Key.DirectionRight -> {
                                     println("Moving right")
-                                    game.move(Direction.MOVE_RIGHT).let { true }
+                                    game.setDirection(Direction.MOVE_RIGHT).let { true }
                                 }
 
                                 Key.DirectionLeft -> {
-                                    game.move(Direction.MOVE_LEFT).let { true }
+                                    game.setDirection(Direction.MOVE_LEFT).let { true }
                                 }
                                 else -> false
                             }
@@ -79,11 +86,11 @@ fun main() {
                         KeyEvent.KEY_RELEASED -> {
                             when (it.key) {
                                 Key.DirectionRight -> {
-                                    game.move(Direction.IDLE_RIGHT).let { true }
+                                    game.setDirection(Direction.IDLE_RIGHT).let { true }
                                 }
 
                                 Key.DirectionLeft -> {
-                                    game.move(Direction.IDLE_LEFT).let { true }
+                                    game.setDirection(Direction.IDLE_LEFT).let { true }
                                 }
 
                                 else -> false
@@ -107,7 +114,7 @@ fun main() {
             )
 
             // Floor
-            val floorBricks = game.gameFrame.value.floorBricks
+            val floorBricks = gameFrame.floorBricks
 
             val visibleBricks = floorBricks.filter {
                 it.x in -MarioGame.BRICK_WIDTH..WINDOW_WIDTH && it.y in 0..WINDOW_HEIGHT
@@ -117,20 +124,24 @@ fun main() {
 
                 // Floor
                 drawImage(
-                    image = brickPng,
+                    image = R.graphics.brickPng,
                     dstOffset = IntOffset(floorBrick.x, floorBrick.y),
                     dstSize = IntSize(MarioGame.BRICK_WIDTH, MarioGame.BRICK_HEIGHT)
                 )
             }
 
-            drawImage(
-                image = marioSprite,
-                srcOffset = IntOffset(209, 52),
-                srcSize = IntSize(16, 32),
-
-                dstOffset = IntOffset(20, MIN_Y - 60),
-                dstSize = IntSize(30, 60),
-            )
+            // Mario
+            val mario = gameFrame.mario
+            drawIntoCanvas { canvas ->
+                canvas.drawImageRect(
+                    image = R.graphics.marioSprite,
+                    paint = marioPaint,
+                    srcOffset = mario.action.srcOffset,
+                    srcSize = mario.action.srcSize,
+                    dstOffset = mario.dstOffset,
+                    dstSize = mario.action.dstSize,
+                )
+            }
         }
     }
 

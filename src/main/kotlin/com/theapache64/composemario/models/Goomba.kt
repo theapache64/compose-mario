@@ -3,4 +3,4 @@ package com.theapache64.composemario.models
 /**
  * Mushroom-like species
  */
-class Goomba(x: Int, y: Int) : Point(x, y)
+data class Goomba(val x: Int, val y: Int)
