@@ -7,4 +7,5 @@ data class GameFrame(
     val floorBricks: List<FloorBrick>,
     val goombas: List<Goomba>,
     val direction: Direction,
+    val isGameOver: Boolean = false,
 )

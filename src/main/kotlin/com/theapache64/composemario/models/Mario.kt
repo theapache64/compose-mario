@@ -2,7 +2,6 @@ package com.theapache64.composemario.models
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.theapache64.composemario.core.MarioGame.Companion.BRICK_START_Y
 
 data class Mario(
     val action: Action,
@@ -19,8 +18,9 @@ data class Mario(
          * Where life begins
          */
         val START_ACTION = Action.SMALL_LOOK_RIGHT
-        val START_OFFSET = IntOffset(20, BRICK_START_Y - START_ACTION.dstSize.height)
+        val START_OFFSET = IntOffset(20, 0)
     }
+
 
     /**
      * All actions mario can do
@@ -40,6 +40,7 @@ data class Mario(
             srcOffset = IntOffset(211, 0),
             srcSize = IntSize(13, 16)
         )
+
 
     }
 }

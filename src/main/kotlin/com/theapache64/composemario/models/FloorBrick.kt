@@ -31,11 +31,7 @@ data class FloorBrick(
                     val by = MarioGame.BRICK_START_Y + (BRICK_HEIGHT * rowIndex)
                     print("[$bx, $by] ")
                     val floorBrick = FloorBrick(bx, by)
-                    if (rowIndex == 0 && columnIndex == 5) {
-                        // do nothing
-                    } else {
-                        floorBricks.add(floorBrick)
-                    }
+                    floorBricks.add(floorBrick)
                 }
                 println(" ")
             }
