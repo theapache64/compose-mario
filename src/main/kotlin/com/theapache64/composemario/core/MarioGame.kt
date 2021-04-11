@@ -7,8 +7,11 @@ import androidx.compose.ui.unit.IntOffset
 import com.theapache64.composemario.WINDOW_HEIGHT
 import com.theapache64.composemario.WINDOW_WIDTH
 import com.theapache64.composemario.core.MarioGame.Companion.BRICK_START_Y
+import com.theapache64.composemario.core.MarioGame.Companion.CLOUD_SPEED
+import com.theapache64.composemario.core.MarioGame.Companion.JUMP_SPEED
 import com.theapache64.composemario.core.MarioGame.Companion.MARIO_SPEED
 import com.theapache64.composemario.core.base.Game
+import com.theapache64.composemario.models.Cloud
 import com.theapache64.composemario.models.FloorBrick
 import com.theapache64.composemario.models.GameFrame
 import com.theapache64.composemario.models.Mario
@@ -18,13 +21,15 @@ class MarioGame : Game {
     companion object {
 
         const val MARIO_SPEED = 15
-        const val LEVEL_LENGTH = WINDOW_WIDTH * 0.5 // 10 times the screen
+        const val CLOUD_SPEED = 5
+        const val LEVEL_LENGTH = WINDOW_WIDTH * 5 // 10 times the screen
 
         /**
          * 30% bricks so 70% play area. this may become dynamic as we build more levels
          */
         const val BRICK_START_Y = (WINDOW_HEIGHT * 0.70).toInt()
         const val MAX_JUMP_HEIGHT = (WINDOW_HEIGHT * 0.30)
+        const val JUMP_SPEED = FloorBrick.BRICK_HEIGHT
     }
 
 
@@ -35,6 +40,7 @@ class MarioGame : Game {
             GameFrame(
                 mario = Mario(action = Mario.START_ACTION, dstOffset = Mario.START_OFFSET),
                 floorBricks = FloorBrick.createFloorBricks(), // building floor bricks
+                clouds = Cloud.createClouds(),
                 goombas = listOf(), // TODO : I can't wait implement this xD
                 direction = Direction.IDLE_RIGHT // Face right
             )
@@ -59,11 +65,14 @@ class MarioGame : Game {
                 direction
             }
 
+            val newClouds = clouds.step(direction)
+
             copy(
                 mario = newMario,
                 floorBricks = newBricks,
                 isGameOver = isGameOver,
-                direction = newDirection
+                direction = newDirection,
+                clouds = newClouds
             )
         }
     }
@@ -78,6 +87,17 @@ class MarioGame : Game {
 
     private inline fun update(func: GameFrame.() -> GameFrame) {
         _gameFrame.value = _gameFrame.value.func()
+    }
+}
+
+private fun List<Cloud>.step(direction: Direction): List<Cloud> {
+    return when (direction) {
+        Direction.MOVE_RIGHT -> {
+            map { cloud ->
+                cloud.copy(x = cloud.x - CLOUD_SPEED)
+            }
+        }
+        else -> this
     }
 }
 
@@ -97,7 +117,7 @@ private fun Mario.step(
 
     val shouldGoDown = if (direction != Direction.UP) {
         if (footBrick != null) {
-            println("Has brick! @$footBrick foot @$marioFootY")
+            // println("Has brick! @$footBrick foot @$marioFootY")
             false
         } else {
             println("No brick below $marioFootY")
@@ -113,10 +133,10 @@ private fun Mario.step(
         // Go down
         when (direction) {
             Direction.UP -> {
-                dstOffset.y - 15
+                dstOffset.y - JUMP_SPEED
             }
             Direction.DOWN -> {
-                var newY = dstOffset.y + 15
+                var newY = dstOffset.y + JUMP_SPEED
                 if (newY >= BRICK_START_Y) {
                     newY = BRICK_START_Y - FloorBrick.BRICK_HEIGHT
                 }
@@ -150,7 +170,11 @@ private fun Mario.step(
 
     val newAction = when (direction) {
         Direction.UP -> {
-            Mario.Action.SMALL_JUMP_RIGHT // TODO
+            when (action) {
+                Mario.Action.SMALL_LOOK_RIGHT -> Mario.Action.SMALL_JUMP_RIGHT
+                Mario.Action.SMALL_LOOK_LEFT -> Mario.Action.SMALL_JUMP_LEFT
+                else -> action
+            }
         }
         Direction.MOVE_RIGHT -> {
             when (action) {

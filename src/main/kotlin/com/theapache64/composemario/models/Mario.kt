@@ -12,7 +12,7 @@ data class Mario(
         /**
          * When mario reaches at this percentage of screen, the movement will switch to bricks
          */
-        const val PUSH_PERCENTAGE = 25
+        const val PUSH_PERCENTAGE = 50
 
         /**
          * Where life begins
@@ -94,7 +94,7 @@ data class Mario(
         ),
 
         SMALL_JUMP_LEFT(
-            srcOffset = IntOffset(331, 0),
+            srcOffset = IntOffset(29, 0),
             srcSize = IntSize(17, 16)
         ),
 

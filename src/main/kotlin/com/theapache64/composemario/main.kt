@@ -24,6 +24,7 @@ import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
 import com.theapache64.composemario.core.R
 import com.theapache64.composemario.core.base.Game
+import com.theapache64.composemario.models.Cloud
 import com.theapache64.composemario.models.FloorBrick
 import com.theapache64.composemario.theme.ComposeMarioTheme
 import com.theapache64.composemario.theme.CornflowerBlue
@@ -127,20 +128,23 @@ fun main() {
                         color = CornflowerBlue
                     )
 
-                    // Rendering floor bricks
-                    for (floorBrick in gameFrame.floorBricks.filterVisibleBricks()) {
-                        // FloorBrick
-                        drawImage(
-                            image = R.graphics.brickPng,
-                            dstOffset = IntOffset(floorBrick.x, floorBrick.y),
-                            dstSize = IntSize(FloorBrick.BRICK_WIDTH, FloorBrick.BRICK_HEIGHT),
-                        )
-                    }
-
 
                     // Mario
                     val mario = gameFrame.mario
                     drawIntoCanvas { canvas ->
+
+                        // Rendering floor bricks
+                        for (floorBrick in gameFrame.floorBricks.filterVisibleBricks()) {
+                            // FloorBrick
+                            canvas.drawImageRect(
+                                image = R.graphics.brickPng,
+                                dstOffset = IntOffset(floorBrick.x, floorBrick.y),
+                                dstSize = IntSize(FloorBrick.BRICK_WIDTH, FloorBrick.BRICK_HEIGHT),
+                                paint = marioPaint
+                            )
+                        }
+
+                        // Draw mario
                         canvas.drawImageRect(
                             image = R.graphics.marioSprite,
                             paint = marioPaint,
@@ -149,6 +153,19 @@ fun main() {
                             dstOffset = mario.dstOffset,
                             dstSize = mario.action.dstSize,
                         )
+
+                        // Draw cloud
+                        for (cloud in gameFrame.clouds.filterVisibleClouds()) {
+                            canvas.drawImageRect(
+                                image = R.graphics.scenerySprite,
+                                paint = marioPaint,
+                                srcOffset = cloud.type.srcOffset,
+                                srcSize = cloud.type.srcSize,
+                                dstOffset = IntOffset(cloud.x, cloud.y),
+                                dstSize = cloud.type.dstSize,
+                            )
+                        }
+
                     }
 
                     // TODO: To remove : only for debug
@@ -179,5 +196,11 @@ fun main() {
 private fun List<FloorBrick>.filterVisibleBricks(): List<FloorBrick> {
     return this.filter { brick ->
         brick.x in -FloorBrick.BRICK_WIDTH..WINDOW_WIDTH && brick.y in 0..WINDOW_HEIGHT
+    }
+}
+
+private fun List<Cloud>.filterVisibleClouds(): List<Cloud> {
+    return this.filter { cloud ->
+        cloud.x in -(cloud.type.dstSize.width)..WINDOW_WIDTH && cloud.y in 0..WINDOW_HEIGHT
     }
 }
