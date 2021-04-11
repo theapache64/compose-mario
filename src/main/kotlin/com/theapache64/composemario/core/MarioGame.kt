@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 import com.theapache64.composemario.WINDOW_HEIGHT
 import com.theapache64.composemario.WINDOW_WIDTH
+import com.theapache64.composemario.core.MarioGame.Companion.BRICK_START_Y
 import com.theapache64.composemario.core.MarioGame.Companion.MARIO_SPEED
 import com.theapache64.composemario.core.base.Game
 import com.theapache64.composemario.models.FloorBrick
@@ -23,6 +24,7 @@ class MarioGame : Game {
          * 30% bricks so 70% play area. this may become dynamic as we build more levels
          */
         const val BRICK_START_Y = (WINDOW_HEIGHT * 0.70).toInt()
+        const val MAX_JUMP_HEIGHT = (WINDOW_HEIGHT * 0.30)
     }
 
 
@@ -48,10 +50,20 @@ class MarioGame : Game {
             val newBricks = floorBricks.step(mario, direction)
             val newMario = mario.step(direction, newBricks)
             val isGameOver = newMario.dstOffset.y > WINDOW_HEIGHT
+
+            val newDirection = if (direction == Direction.UP && newMario.dstOffset.y <= MAX_JUMP_HEIGHT) {
+                Direction.DOWN
+            } else if (direction == Direction.DOWN && newMario.dstOffset.y >= (BRICK_START_Y - FloorBrick.BRICK_HEIGHT)) {
+                Direction.IDLE_RIGHT
+            } else {
+                direction
+            }
+
             copy(
                 mario = newMario,
                 floorBricks = newBricks,
-                isGameOver = isGameOver
+                isGameOver = isGameOver,
+                direction = newDirection
             )
         }
     }
@@ -83,19 +95,39 @@ private fun Mario.step(
         marioFootX in brick.x - FloorBrick.BRICK_WIDTH..brick.x && marioFootY in brick.y..brick.y + FloorBrick.BRICK_HEIGHT
     }
 
-    val shouldGoDown = if (footBrick != null) {
-        println("Has brick! @$footBrick foot @$marioFootY")
-        false
+    val shouldGoDown = if (direction != Direction.UP) {
+        if (footBrick != null) {
+            println("Has brick! @$footBrick foot @$marioFootY")
+            false
+        } else {
+            println("No brick below $marioFootY")
+            true
+        }
     } else {
-        println("No brick below $marioFootY")
-        true
+        false
     }
 
     val newY = if (shouldGoDown) {
         dstOffset.y + FloorBrick.BRICK_HEIGHT
     } else {
-        dstOffset.y
+        // Go down
+        when (direction) {
+            Direction.UP -> {
+                dstOffset.y - 15
+            }
+            Direction.DOWN -> {
+                var newY = dstOffset.y + 15
+                if (newY >= BRICK_START_Y) {
+                    newY = BRICK_START_Y - FloorBrick.BRICK_HEIGHT
+                }
+                newY
+            }
+            else -> {
+                dstOffset.y
+            }
+        }
     }
+
 
     val newX = if (marioXPercentage <= Mario.PUSH_PERCENTAGE && direction == Direction.MOVE_RIGHT) {
         println("Mario moves")
@@ -117,6 +149,9 @@ private fun Mario.step(
 
 
     val newAction = when (direction) {
+        Direction.UP -> {
+            Mario.Action.SMALL_JUMP_RIGHT // TODO
+        }
         Direction.MOVE_RIGHT -> {
             when (action) {
                 Mario.Action.SMALL_WALK_LEFT_BRAKE -> Mario.Action.SMALL_WALK_RIGHT_1
@@ -130,7 +165,7 @@ private fun Mario.step(
                 Mario.Action.SMALL_WALK_LEFT_2,
                 Mario.Action.SMALL_WALK_LEFT_3,
                     // -> Mario.Action.SMALL_WALK_LEFT_BRAKE
-                -> TODO("Brake left")
+                -> Mario.Action.SMALL_WALK_RIGHT_BRAKE // FIXME: Brake is too fast
 
 
                 else -> Mario.Action.SMALL_LOOK_RIGHT // TODO
@@ -148,7 +183,7 @@ private fun Mario.step(
                 Mario.Action.SMALL_WALK_RIGHT_1,
                 Mario.Action.SMALL_WALK_RIGHT_2,
                 Mario.Action.SMALL_WALK_RIGHT_3,
-                -> Mario.Action.SMALL_WALK_RIGHT_BRAKE
+                -> Mario.Action.SMALL_WALK_LEFT_BRAKE // FIXME: Brake is too fast
 
                 else -> Mario.Action.SMALL_LOOK_LEFT // TODO
             }
@@ -163,7 +198,7 @@ private fun Mario.step(
 
     return copy(
         dstOffset = IntOffset(newX, newY),
-        action = newAction
+        action = newAction,
     )
 }
 
@@ -171,16 +206,10 @@ private fun List<FloorBrick>.step(
     mario: Mario,
     direction: Direction,
 ): List<FloorBrick> {
+    /**
+     * Move bricks only when we talk right
+     */
     return when (direction) {
-        Direction.IDLE_LEFT -> {
-            this
-        }
-        Direction.IDLE_RIGHT -> {
-            this
-        }
-        Direction.MOVE_LEFT -> {
-            this
-        }
         Direction.MOVE_RIGHT -> {
             val marioYPercentage = (mario.dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
             println("MarioAt : $marioYPercentage")
@@ -193,11 +222,6 @@ private fun List<FloorBrick>.step(
                 this
             }
         }
-        Direction.UP -> {
-            this
-        }
-        Direction.DOWN -> {
-            this
-        }
+        else -> this
     }
 }

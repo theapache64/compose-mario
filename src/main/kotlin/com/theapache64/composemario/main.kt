@@ -12,8 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -90,6 +88,11 @@ fun main() {
                                         Key.DirectionLeft -> {
                                             game.setDirection(Direction.MOVE_LEFT).let { true }
                                         }
+
+                                        Key.Spacebar -> {
+                                            game.setDirection(Direction.UP).let { true }
+                                        }
+
                                         else -> false
                                     }
                                 }

@@ -62,9 +62,9 @@ data class Mario(
             srcSize = IntSize(14, 16)
         ),
 
-        SMALL_RUN_RIGHT(
-            srcOffset = IntOffset(331, 0),
-            srcSize = IntSize(14, 16)
+        SMALL_JUMP_RIGHT(
+            srcOffset = IntOffset(359, 0),
+            srcSize = IntSize(17, 16)
         ),
 
         // SMALL - LEFT
@@ -93,7 +93,7 @@ data class Mario(
             srcSize = IntSize(16, 16)
         ),
 
-        SMALL_RUN_LEFT(
+        SMALL_JUMP_LEFT(
             srcOffset = IntOffset(331, 0),
             srcSize = IntSize(17, 16)
         ),
