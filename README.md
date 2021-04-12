@@ -1,5 +1,5 @@
 
-# compose-mario
+#🎮 compose-mario
 
 ![](demo.gif)
 
