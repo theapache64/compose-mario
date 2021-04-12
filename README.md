@@ -15,8 +15,9 @@
 
 > An attempt to create Super Mario Bros using Compose for Desktop
 
-**⚠️ THIS PROJECT IS UNDER ACTIVE DEVELOPMENT 👷. BUGS AND HEAVY CHANGES ARE EXPECTED**
+## 🏗️ Under Active Development 
 
+**THIS PROJECT IS UNDER ACTIVE DEVELOPMENT. WTF-BUGS AND HEAVY CHANGES ARE EXPECTED**
 
 
 ## ✍️ Author
