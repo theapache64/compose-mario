@@ -64,11 +64,15 @@ data class Forest(
             }
         }
 
-        fun List<Forest>.stepForests(direction: Direction): List<Forest> {
-            return when (direction) {
-                Direction.MOVE_RIGHT -> {
-                    map { forest ->
-                        forest.copy(x = forest.x - MarioGame.FOREST_SPEED)
+        fun List<Forest>.stepForests(direction: Set<Direction>, mario: Mario): List<Forest> {
+            return when {
+                direction.contains(Direction.MOVE_RIGHT) -> {
+                    if (mario.shouldMoveOtherObjects()) {
+                        map { forest ->
+                            forest.copy(x = forest.x - MarioGame.FOREST_SPEED)
+                        }
+                    } else {
+                        this
                     }
                 }
                 else -> this

@@ -19,9 +19,9 @@ class MarioGame : Game {
     companion object {
 
         const val MARIO_SPEED = 15
-        const val CLOUD_SPEED = 5
-        const val MOUNTAIN_SPEED = 7
-        const val FOREST_SPEED = 6
+        const val CLOUD_SPEED = (MARIO_SPEED * 0.3f).toInt()
+        const val MOUNTAIN_SPEED = (MARIO_SPEED * 0.5f).toInt()
+        const val FOREST_SPEED = (MARIO_SPEED * 0.8f).toInt()
         const val TUBE_SPEED = MARIO_SPEED
         const val LEVEL_LENGTH = WINDOW_WIDTH * 5 // x times the screen
 
@@ -29,8 +29,6 @@ class MarioGame : Game {
          * 30% bricks so 70% play area. this may become dynamic as we build more levels
          */
         const val BRICK_START_Y = (WINDOW_HEIGHT * 0.70).toInt()
-        const val MAX_JUMP_HEIGHT = (WINDOW_HEIGHT * 0.30)
-        const val JUMP_SPEED = FloorBrick.BRICK_HEIGHT
     }
 
 
@@ -46,7 +44,7 @@ class MarioGame : Game {
                 forests = Forest.createForests(),
                 tubes = Tube.createTubes(),
                 goombas = listOf(), // TODO : I can't wait to implement this xD
-                direction = Direction.IDLE_RIGHT, // Face right
+                directions = mutableSetOf(Direction.IDLE_RIGHT), // Face right
             )
         )
     }
@@ -56,15 +54,15 @@ class MarioGame : Game {
 
     override fun step() {
         update {
-            val newBricks = floorBricks.stepFloorBricks(mario, direction)
-            val newMario = mario.stepMario(direction, newBricks)
+            val newBricks = floorBricks.stepFloorBricks(mario, directions)
+            val newMario = mario.stepMario(directions, newBricks)
             val isGameOver = newMario.dstOffset.y > WINDOW_HEIGHT
 
 
-            val newClouds = clouds.stepClouds(direction)
-            val newMountains = mountains.stepMountains(direction)
-            val newForests = forests.stepForests(direction)
-            val newTubes = tubes.stepTubes(direction)
+            val newClouds = clouds.stepClouds(directions, newMario)
+            val newMountains = mountains.stepMountains(directions, newMario)
+            val newForests = forests.stepForests(directions, newMario)
+            val newTubes = tubes.stepTubes(directions, newMario)
 
             copy(
                 mario = newMario,
@@ -78,10 +76,21 @@ class MarioGame : Game {
         }
     }
 
-    override fun setDirection(direction: Direction) {
+
+    override fun setDirection(newDirection: Direction) {
         update {
+            val newDirections = directions.apply {
+                if (newDirection != Direction.MOVE_UP) {
+                    clear()
+                }
+
+                add(newDirection)
+            }
+
+            println(newDirections)
+
             copy(
-                direction = direction
+                directions = newDirections
             )
         }
     }

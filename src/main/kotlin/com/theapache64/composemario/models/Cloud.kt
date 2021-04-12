@@ -70,11 +70,15 @@ data class Cloud(
             }
         }
 
-        fun List<Cloud>.stepClouds(direction: Direction): List<Cloud> {
-            return when (direction) {
-                Direction.MOVE_RIGHT -> {
-                    map { cloud ->
-                        cloud.copy(x = cloud.x - MarioGame.CLOUD_SPEED)
+        fun List<Cloud>.stepClouds(direction: Set<Direction>, mario: Mario): List<Cloud> {
+            return when {
+                direction.contains(Direction.MOVE_RIGHT) -> {
+                    if (mario.shouldMoveOtherObjects()) {
+                        map { cloud ->
+                            cloud.copy(x = cloud.x - MarioGame.CLOUD_SPEED)
+                        }
+                    } else {
+                        this
                     }
                 }
                 else -> this

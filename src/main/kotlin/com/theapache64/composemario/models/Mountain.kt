@@ -74,15 +74,21 @@ data class Mountain(
             }
         }
 
-        fun List<Mountain>.stepMountains(direction: Direction): List<Mountain> {
-            return when (direction) {
-                Direction.MOVE_RIGHT -> {
+        fun List<Mountain>.stepMountains(directions: Set<Direction>, mario: Mario): List<Mountain> {
+
+            return if (directions.contains(Direction.MOVE_RIGHT)) {
+                if (mario.shouldMoveOtherObjects()) {
                     map { mountain ->
                         mountain.copy(x = mountain.x - MarioGame.MOUNTAIN_SPEED)
                     }
+                } else {
+                    this
                 }
-                else -> this
+            } else {
+                this
             }
+
+
         }
     }
 

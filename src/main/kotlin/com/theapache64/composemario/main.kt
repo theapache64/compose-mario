@@ -94,6 +94,10 @@ fun main() {
                                             game.setDirection(Direction.MOVE_LEFT).let { true }
                                         }
 
+                                        Key.Spacebar -> {
+                                            game.setDirection(Direction.MOVE_UP).let { true }
+                                        }
+
                                         else -> false
                                     }
                                 }

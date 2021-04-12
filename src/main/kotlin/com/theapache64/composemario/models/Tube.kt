@@ -51,11 +51,15 @@ data class Tube(
             }
         }
 
-        fun List<Tube>.stepTubes(direction: Direction): List<Tube> {
-            return when (direction) {
-                Direction.MOVE_RIGHT -> {
-                    map { tube ->
-                        tube.copy(x = tube.x - MarioGame.TUBE_SPEED)
+        fun List<Tube>.stepTubes(direction: Set<Direction>, mario: Mario): List<Tube> {
+            return when {
+                direction.contains(Direction.MOVE_RIGHT) -> {
+                    if (mario.shouldMoveOtherObjects()) {
+                        map { tube ->
+                            tube.copy(x = tube.x - MarioGame.TUBE_SPEED)
+                        }
+                    } else {
+                        this
                     }
                 }
                 else -> this

@@ -2,6 +2,7 @@ package com.theapache64.composemario.models
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import com.theapache64.composemario.WINDOW_HEIGHT
 import com.theapache64.composemario.WINDOW_WIDTH
 import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
@@ -21,61 +22,37 @@ data class Mario(
          * Where life begins
          */
         val START_ACTION = Action.SMALL_LOOK_RIGHT
-        val START_OFFSET = IntOffset(20, 0)
+        val START_OFFSET = IntOffset(20, MarioGame.BRICK_START_Y - START_ACTION.dstSize.height)
+
+        const val MAX_JUMP_HEIGHT = (WINDOW_HEIGHT * 0.30)
+        const val JUMP_SPEED = FloorBrick.BRICK_HEIGHT
 
         fun Mario.stepMario(
-            direction: Direction,
+            directions: Set<Direction>,
             bricks: List<FloorBrick>,
         ): Mario {
+
+            // TODO: Calculate Y to support jump, gravity and fly
+
+            // Calculating X coordinate
             val marioXPercentage = (dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
-
-            // Checking if mario have some
-            val marioFootX = dstOffset.x - FloorBrick.BRICK_WIDTH
-            val marioFootY = dstOffset.y + action.dstSize.height
-            val footBrick = bricks.find { brick ->
-                marioFootX in brick.x - FloorBrick.BRICK_WIDTH..brick.x && marioFootY in brick.y..brick.y + FloorBrick.BRICK_HEIGHT
-            }
-
-            val shouldGoDown = if (direction != Direction.UP) {
-                if (footBrick != null) {
-                    // println("Has brick! @$footBrick foot @$marioFootY")
-                    false
-                } else {
-                    println("No brick below $marioFootY")
-                    true
-                }
-            } else {
-                false
-            }
-
-            val newY = if (shouldGoDown) {
-                dstOffset.y + FloorBrick.BRICK_HEIGHT
-            } else {
-                dstOffset.y
-            }
-
-
-            val newX = if (marioXPercentage <= PUSH_PERCENTAGE && direction == Direction.MOVE_RIGHT) {
-                println("Mario moves")
+            val newX = if (marioXPercentage <= PUSH_PERCENTAGE && directions.contains(Direction.MOVE_RIGHT)) {
                 dstOffset.x + MarioGame.MARIO_SPEED
             } else {
-                when (direction) {
-                    Direction.MOVE_LEFT -> {
-                        println("Mario moving left")
-                        val nx = dstOffset.x - MarioGame.MARIO_SPEED
-                        if (nx >= 0) {
-                            nx
-                        } else {
-                            dstOffset.x
-                        }
+                if (directions.contains(Direction.MOVE_LEFT)) {
+                    val nx = dstOffset.x - MarioGame.MARIO_SPEED
+                    if (nx >= 0) {
+                        nx
+                    } else {
+                        dstOffset.x
                     }
-                    else -> dstOffset.x
+                } else {
+                    dstOffset.x
                 }
             }
 
-
-            val newAction = when (direction) {
-                Direction.MOVE_RIGHT -> {
+            val newAction = when {
+                directions.contains(Direction.MOVE_RIGHT) -> {
                     when (action) {
                         Action.SMALL_WALK_LEFT_BRAKE -> Action.SMALL_WALK_RIGHT_1
                         Action.SMALL_LOOK_RIGHT -> Action.SMALL_WALK_RIGHT_1
@@ -94,7 +71,8 @@ data class Mario(
                         else -> Action.SMALL_LOOK_RIGHT // TODO
                     }
                 }
-                Direction.MOVE_LEFT -> {
+
+                directions.contains(Direction.MOVE_LEFT) -> {
                     when (action) {
                         Action.SMALL_WALK_RIGHT_BRAKE -> Action.SMALL_WALK_LEFT_1
                         Action.SMALL_LOOK_LEFT -> Action.SMALL_WALK_LEFT_1
@@ -111,16 +89,22 @@ data class Mario(
                         else -> Action.SMALL_LOOK_LEFT // TODO
                     }
                 }
-                Direction.IDLE_RIGHT -> Action.SMALL_LOOK_RIGHT
-                Direction.IDLE_LEFT -> Action.SMALL_LOOK_LEFT
+
+                directions.contains(Direction.IDLE_RIGHT) -> {
+                    Action.SMALL_LOOK_RIGHT
+                }
+
+                directions.contains(Direction.IDLE_LEFT) -> {
+                    Action.SMALL_LOOK_LEFT
+                }
+
                 else -> {
-                    // TODO : Handle more directions
                     action
                 }
             }
 
             return copy(
-                dstOffset = IntOffset(newX, newY),
+                dstOffset = IntOffset(newX, dstOffset.y),
                 action = newAction,
             )
         }
@@ -202,6 +186,11 @@ data class Mario(
             srcOffset = IntOffset(29, 0),
             srcSize = IntSize(17, 16)
         ),
+    }
 
+    fun shouldMoveOtherObjects(): Boolean {
+        val marioYPercentage = (dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
+        println("MarioAt : $marioYPercentage")
+        return marioYPercentage >= PUSH_PERCENTAGE
     }
 }

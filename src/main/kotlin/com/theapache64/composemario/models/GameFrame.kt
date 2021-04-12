@@ -10,6 +10,6 @@ data class GameFrame(
     val forests: List<Forest>,
     val tubes: List<Tube>,
     val goombas: List<Goomba>,
-    val direction: Direction,
+    val directions: MutableSet<Direction>,
     val isGameOver: Boolean = false,
 )

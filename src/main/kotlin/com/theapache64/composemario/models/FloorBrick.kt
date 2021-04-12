@@ -1,6 +1,5 @@
 package com.theapache64.composemario.models
 
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.theapache64.composemario.WINDOW_HEIGHT
 import com.theapache64.composemario.WINDOW_WIDTH
@@ -54,28 +53,24 @@ data class FloorBrick(
 
         fun List<FloorBrick>.stepFloorBricks(
             mario: Mario,
-            direction: Direction,
+            directions: Set<Direction>,
         ): List<FloorBrick> {
             /**
              * Move bricks only when we talk right
              */
-            return when (direction) {
-                Direction.MOVE_RIGHT -> {
-                    val marioYPercentage = (mario.dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
-                    println("MarioAt : $marioYPercentage")
-                    if (marioYPercentage >= Mario.PUSH_PERCENTAGE) {
-                        // Mario moved more than push percentage, now let's move the bricks
-                        map { brick ->
-                            brick.copy(x = brick.x - MarioGame.MARIO_SPEED)
-                        }
-                    } else {
-                        this
+            return if (directions.contains(Direction.MOVE_RIGHT)) {
+                if (mario.shouldMoveOtherObjects()) {
+                    map { brick ->
+                        brick.copy(x = brick.x - MarioGame.MARIO_SPEED)
                     }
+                } else {
+                    this
                 }
-                else -> this
+            } else {
+                this
             }
-        }
 
+        }
 
 
     }
