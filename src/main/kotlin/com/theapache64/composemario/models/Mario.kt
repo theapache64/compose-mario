@@ -51,26 +51,11 @@ data class Mario(
             val newY = if (shouldGoDown) {
                 dstOffset.y + FloorBrick.BRICK_HEIGHT
             } else {
-                // Go down
-                when (direction) {
-                    Direction.UP -> {
-                        dstOffset.y - MarioGame.JUMP_SPEED
-                    }
-                    Direction.DOWN -> {
-                        var newY = dstOffset.y + MarioGame.JUMP_SPEED
-                        if (newY >= MarioGame.BRICK_START_Y) {
-                            newY = MarioGame.BRICK_START_Y - FloorBrick.BRICK_HEIGHT
-                        }
-                        newY
-                    }
-                    else -> {
-                        dstOffset.y
-                    }
-                }
+                dstOffset.y
             }
 
 
-            val newX = if (marioXPercentage <= Mario.PUSH_PERCENTAGE && direction == Direction.MOVE_RIGHT) {
+            val newX = if (marioXPercentage <= PUSH_PERCENTAGE && direction == Direction.MOVE_RIGHT) {
                 println("Mario moves")
                 dstOffset.x + MarioGame.MARIO_SPEED
             } else {
@@ -90,51 +75,44 @@ data class Mario(
 
 
             val newAction = when (direction) {
-                Direction.UP -> {
-                    when (action) {
-                        Mario.Action.SMALL_LOOK_RIGHT -> Mario.Action.SMALL_JUMP_RIGHT
-                        Mario.Action.SMALL_LOOK_LEFT -> Mario.Action.SMALL_JUMP_LEFT
-                        else -> action
-                    }
-                }
                 Direction.MOVE_RIGHT -> {
                     when (action) {
-                        Mario.Action.SMALL_WALK_LEFT_BRAKE -> Mario.Action.SMALL_WALK_RIGHT_1
-                        Mario.Action.SMALL_LOOK_RIGHT -> Mario.Action.SMALL_WALK_RIGHT_1
-                        Mario.Action.SMALL_WALK_RIGHT_1 -> Mario.Action.SMALL_WALK_RIGHT_2
-                        Mario.Action.SMALL_WALK_RIGHT_2 -> Mario.Action.SMALL_WALK_RIGHT_3
-                        Mario.Action.SMALL_WALK_RIGHT_3 -> Mario.Action.SMALL_WALK_RIGHT_1
+                        Action.SMALL_WALK_LEFT_BRAKE -> Action.SMALL_WALK_RIGHT_1
+                        Action.SMALL_LOOK_RIGHT -> Action.SMALL_WALK_RIGHT_1
+                        Action.SMALL_WALK_RIGHT_1 -> Action.SMALL_WALK_RIGHT_2
+                        Action.SMALL_WALK_RIGHT_2 -> Action.SMALL_WALK_RIGHT_3
+                        Action.SMALL_WALK_RIGHT_3 -> Action.SMALL_WALK_RIGHT_1
 
                         // If he was running left, then brake
-                        Mario.Action.SMALL_WALK_LEFT_1,
-                        Mario.Action.SMALL_WALK_LEFT_2,
-                        Mario.Action.SMALL_WALK_LEFT_3,
+                        Action.SMALL_WALK_LEFT_1,
+                        Action.SMALL_WALK_LEFT_2,
+                        Action.SMALL_WALK_LEFT_3,
                             // -> Mario.Action.SMALL_WALK_LEFT_BRAKE
-                        -> Mario.Action.SMALL_WALK_RIGHT_BRAKE // FIXME: Brake is too fast
+                        -> Action.SMALL_WALK_RIGHT_BRAKE // FIXME: Brake is too fast
 
 
-                        else -> Mario.Action.SMALL_LOOK_RIGHT // TODO
+                        else -> Action.SMALL_LOOK_RIGHT // TODO
                     }
                 }
                 Direction.MOVE_LEFT -> {
                     when (action) {
-                        Mario.Action.SMALL_WALK_RIGHT_BRAKE -> Mario.Action.SMALL_WALK_LEFT_1
-                        Mario.Action.SMALL_LOOK_LEFT -> Mario.Action.SMALL_WALK_LEFT_1
-                        Mario.Action.SMALL_WALK_LEFT_1 -> Mario.Action.SMALL_WALK_LEFT_2
-                        Mario.Action.SMALL_WALK_LEFT_2 -> Mario.Action.SMALL_WALK_LEFT_3
-                        Mario.Action.SMALL_WALK_LEFT_3 -> Mario.Action.SMALL_WALK_LEFT_1
+                        Action.SMALL_WALK_RIGHT_BRAKE -> Action.SMALL_WALK_LEFT_1
+                        Action.SMALL_LOOK_LEFT -> Action.SMALL_WALK_LEFT_1
+                        Action.SMALL_WALK_LEFT_1 -> Action.SMALL_WALK_LEFT_2
+                        Action.SMALL_WALK_LEFT_2 -> Action.SMALL_WALK_LEFT_3
+                        Action.SMALL_WALK_LEFT_3 -> Action.SMALL_WALK_LEFT_1
 
                         // If he was running right, then brake
-                        Mario.Action.SMALL_WALK_RIGHT_1,
-                        Mario.Action.SMALL_WALK_RIGHT_2,
-                        Mario.Action.SMALL_WALK_RIGHT_3,
-                        -> Mario.Action.SMALL_WALK_LEFT_BRAKE // FIXME: Brake is too fast
+                        Action.SMALL_WALK_RIGHT_1,
+                        Action.SMALL_WALK_RIGHT_2,
+                        Action.SMALL_WALK_RIGHT_3,
+                        -> Action.SMALL_WALK_LEFT_BRAKE // FIXME: Brake is too fast
 
-                        else -> Mario.Action.SMALL_LOOK_LEFT // TODO
+                        else -> Action.SMALL_LOOK_LEFT // TODO
                     }
                 }
-                Direction.IDLE_RIGHT -> Mario.Action.SMALL_LOOK_RIGHT
-                Direction.IDLE_LEFT -> Mario.Action.SMALL_LOOK_LEFT
+                Direction.IDLE_RIGHT -> Action.SMALL_LOOK_RIGHT
+                Direction.IDLE_LEFT -> Action.SMALL_LOOK_LEFT
                 else -> {
                     // TODO : Handle more directions
                     action

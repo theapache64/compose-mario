@@ -45,7 +45,7 @@ class MarioGame : Game {
                 clouds = Cloud.createClouds(),
                 forests = Forest.createForests(),
                 tubes = Tube.createTubes(),
-                goombas = listOf(), // TODO : I can't wait implement this xD
+                goombas = listOf(), // TODO : I can't wait to implement this xD
                 direction = Direction.IDLE_RIGHT, // Face right
             )
         )
@@ -60,13 +60,6 @@ class MarioGame : Game {
             val newMario = mario.stepMario(direction, newBricks)
             val isGameOver = newMario.dstOffset.y > WINDOW_HEIGHT
 
-            val newDirection = if (direction == Direction.UP && newMario.dstOffset.y <= MAX_JUMP_HEIGHT) {
-                Direction.DOWN
-            } else if (direction == Direction.DOWN && newMario.dstOffset.y >= (BRICK_START_Y - FloorBrick.BRICK_HEIGHT)) {
-                Direction.IDLE_RIGHT
-            } else {
-                direction
-            }
 
             val newClouds = clouds.stepClouds(direction)
             val newMountains = mountains.stepMountains(direction)
@@ -77,7 +70,6 @@ class MarioGame : Game {
                 mario = newMario,
                 floorBricks = newBricks,
                 isGameOver = isGameOver,
-                direction = newDirection,
                 clouds = newClouds,
                 mountains = newMountains,
                 forests = newForests,
