@@ -24,8 +24,12 @@ import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
 import com.theapache64.composemario.core.R
 import com.theapache64.composemario.core.base.Game
-import com.theapache64.composemario.models.Cloud
+import com.theapache64.composemario.models.Cloud.Companion.filterVisibleClouds
 import com.theapache64.composemario.models.FloorBrick
+import com.theapache64.composemario.models.FloorBrick.Companion.filterVisibleBricks
+import com.theapache64.composemario.models.Forest.Companion.filterVisibleForests
+import com.theapache64.composemario.models.Mountain.Companion.filterVisibleMountains
+import com.theapache64.composemario.models.Tube.Companion.filterVisibleTubes
 import com.theapache64.composemario.theme.ComposeMarioTheme
 import com.theapache64.composemario.theme.CornflowerBlue
 import kotlinx.coroutines.delay
@@ -37,7 +41,7 @@ const val WINDOW_HEIGHT = 600
 
 val focusRequester = FocusRequester()
 
-val marioPaint by lazy {
+val pixelPaint by lazy {
     Paint().apply { filterQuality = FilterQuality.None }
 }
 
@@ -140,25 +144,16 @@ fun main() {
                                 image = R.graphics.brickPng,
                                 dstOffset = IntOffset(floorBrick.x, floorBrick.y),
                                 dstSize = IntSize(FloorBrick.BRICK_WIDTH, FloorBrick.BRICK_HEIGHT),
-                                paint = marioPaint
+                                paint = pixelPaint
                             )
                         }
 
-                        // Draw mario
-                        canvas.drawImageRect(
-                            image = R.graphics.marioSprite,
-                            paint = marioPaint,
-                            srcOffset = mario.action.srcOffset,
-                            srcSize = mario.action.srcSize,
-                            dstOffset = mario.dstOffset,
-                            dstSize = mario.action.dstSize,
-                        )
 
                         // Draw cloud
                         for (cloud in gameFrame.clouds.filterVisibleClouds()) {
                             canvas.drawImageRect(
                                 image = R.graphics.scenerySprite,
-                                paint = marioPaint,
+                                paint = pixelPaint,
                                 srcOffset = cloud.type.srcOffset,
                                 srcSize = cloud.type.srcSize,
                                 dstOffset = IntOffset(cloud.x, cloud.y),
@@ -166,6 +161,52 @@ fun main() {
                             )
                         }
 
+                        // Draw mountains
+                        for (mountain in gameFrame.mountains.filterVisibleMountains()) {
+                            canvas.drawImageRect(
+                                image = R.graphics.scenerySprite,
+                                paint = pixelPaint,
+                                srcOffset = mountain.type.srcOffset,
+                                srcSize = mountain.type.srcSize,
+                                dstOffset = IntOffset(mountain.x, mountain.y),
+                                dstSize = mountain.type.dstSize,
+                            )
+                        }
+
+                        // Draw forests
+                        for (forest in gameFrame.forests.filterVisibleForests()) {
+                            canvas.drawImageRect(
+                                image = R.graphics.scenerySprite,
+                                paint = pixelPaint,
+                                srcOffset = forest.type.srcOffset,
+                                srcSize = forest.type.srcSize,
+                                dstOffset = IntOffset(forest.x, forest.y),
+                                dstSize = forest.type.dstSize,
+                            )
+                        }
+
+                        // Draw tubes
+                        for (tube in gameFrame.tubes.filterVisibleTubes()) {
+                            canvas.drawImageRect(
+                                image = R.graphics.scenerySprite,
+                                paint = pixelPaint,
+                                srcOffset = tube.type.srcOffset,
+                                srcSize = tube.type.srcSize,
+                                dstOffset = IntOffset(tube.x, tube.y),
+                                dstSize = tube.type.dstSize,
+                            )
+                        }
+
+
+                        // Draw mario
+                        canvas.drawImageRect(
+                            image = R.graphics.marioSprite,
+                            paint = pixelPaint,
+                            srcOffset = mario.action.srcOffset,
+                            srcSize = mario.action.srcSize,
+                            dstOffset = mario.dstOffset,
+                            dstSize = mario.action.dstSize,
+                        )
                     }
 
                     // TODO: To remove : only for debug
@@ -193,14 +234,4 @@ fun main() {
 
 }
 
-private fun List<FloorBrick>.filterVisibleBricks(): List<FloorBrick> {
-    return this.filter { brick ->
-        brick.x in -FloorBrick.BRICK_WIDTH..WINDOW_WIDTH && brick.y in 0..WINDOW_HEIGHT
-    }
-}
 
-private fun List<Cloud>.filterVisibleClouds(): List<Cloud> {
-    return this.filter { cloud ->
-        cloud.x in -(cloud.type.dstSize.width)..WINDOW_WIDTH && cloud.y in 0..WINDOW_HEIGHT
-    }
-}

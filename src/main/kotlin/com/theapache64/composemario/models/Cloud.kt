@@ -3,6 +3,8 @@ package com.theapache64.composemario.models
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.theapache64.composemario.WINDOW_HEIGHT
+import com.theapache64.composemario.WINDOW_WIDTH
+import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
 
 data class Cloud(
@@ -40,8 +42,8 @@ data class Cloud(
             repeat(30) {
                 put(percentageRange.random(), Type.values().random())
             }
-        }
 
+        }
 
 
         fun createClouds(): List<Cloud> {
@@ -61,6 +63,24 @@ data class Cloud(
                 }
             }
         }
+
+        fun List<Cloud>.filterVisibleClouds(): List<Cloud> {
+            return this.filter { cloud ->
+                cloud.x in -(cloud.type.dstSize.width)..WINDOW_WIDTH && cloud.y in 0..WINDOW_HEIGHT
+            }
+        }
+
+        fun List<Cloud>.stepClouds(direction: Direction): List<Cloud> {
+            return when (direction) {
+                Direction.MOVE_RIGHT -> {
+                    map { cloud ->
+                        cloud.copy(x = cloud.x - MarioGame.CLOUD_SPEED)
+                    }
+                }
+                else -> this
+            }
+        }
+
     }
 
     enum class Type(

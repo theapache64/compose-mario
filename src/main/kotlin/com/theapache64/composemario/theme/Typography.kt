@@ -8,7 +8,8 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.sp
 
 val GoogleSans = FontFamily(Font("fonts/Fixedsys500c.ttf", FontWeight.Normal))
-val ComposeMarioTypography = Typography(defaultFontFamily = GoogleSans,
+val ComposeMarioTypography = Typography(
+    defaultFontFamily = GoogleSans,
     h1 = TextStyle(fontSize = 95.sp),
     h2 = TextStyle(fontSize = 59.sp),
     h3 = TextStyle(fontSize = 48.sp),

@@ -1,7 +1,10 @@
 package com.theapache64.composemario.models
 
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.theapache64.composemario.WINDOW_HEIGHT
+import com.theapache64.composemario.WINDOW_WIDTH
+import com.theapache64.composemario.core.Direction
 import com.theapache64.composemario.core.MarioGame
 import kotlin.math.ceil
 
@@ -10,10 +13,12 @@ data class FloorBrick(
     val y: Int,
 ) {
     companion object {
-        // Brick
         const val BRICK_WIDTH = 30
         const val BRICK_HEIGHT = 30
         val BRICK_SIZE = IntSize(BRICK_WIDTH, BRICK_HEIGHT)
+
+        private val X_RANGE = -BRICK_WIDTH..WINDOW_WIDTH
+        private val Y_RANGE = 0..WINDOW_HEIGHT
 
         /**
          * To create floor bricks
@@ -39,5 +44,39 @@ data class FloorBrick(
 
             return floorBricks
         }
+
+        fun List<FloorBrick>.filterVisibleBricks(): List<FloorBrick> {
+            return this.filter { brick ->
+                brick.x in X_RANGE && brick.y in Y_RANGE
+            }
+        }
+
+
+        fun List<FloorBrick>.stepFloorBricks(
+            mario: Mario,
+            direction: Direction,
+        ): List<FloorBrick> {
+            /**
+             * Move bricks only when we talk right
+             */
+            return when (direction) {
+                Direction.MOVE_RIGHT -> {
+                    val marioYPercentage = (mario.dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
+                    println("MarioAt : $marioYPercentage")
+                    if (marioYPercentage >= Mario.PUSH_PERCENTAGE) {
+                        // Mario moved more than push percentage, now let's move the bricks
+                        map { brick ->
+                            brick.copy(x = brick.x - MarioGame.MARIO_SPEED)
+                        }
+                    } else {
+                        this
+                    }
+                }
+                else -> this
+            }
+        }
+
+
+
     }
 }
