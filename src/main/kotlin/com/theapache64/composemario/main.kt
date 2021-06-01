@@ -45,7 +45,6 @@ val pixelPaint by lazy {
     Paint().apply { filterQuality = FilterQuality.None }
 }
 
-
 fun main() {
 
     val game: Game = MarioGame()

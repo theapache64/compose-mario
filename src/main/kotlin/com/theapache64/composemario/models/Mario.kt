@@ -33,6 +33,11 @@ data class Mario(
         ): Mario {
 
             // TODO: Calculate Y to support jump, gravity and fly
+            val newY = if (directions.contains(Direction.MOVE_UP)) {
+                dstOffset.y - 10
+            } else {
+                dstOffset.y
+            }
 
             // Calculating X coordinate
             val marioXPercentage = (dstOffset.x / WINDOW_WIDTH.toFloat()) * 100
@@ -104,7 +109,7 @@ data class Mario(
             }
 
             return copy(
-                dstOffset = IntOffset(newX, dstOffset.y),
+                dstOffset = IntOffset(newX, newY),
                 action = newAction,
             )
         }
